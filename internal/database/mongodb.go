@@ -5,9 +5,10 @@ import (
 	"log"
 	"time"
 
+	"reflecta/internal/config"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"refecta/internal/config"
 )
 
 var DB *mongo.Database
@@ -23,7 +24,12 @@ func ConnectMongo() {
 		log.Fatal("❌ Error connecting to MongoDB:", err)
 	}
 
+	// Ping the database to confirm connection
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatal("❌ Could not ping MongoDB:", err)
+	}
+
 	DB = client.Database("reflecta")
 
-	log.Println("✅ Connected to MongoDB")
+	log.Println("✅ Successfully connected and pinged MongoDB")
 }

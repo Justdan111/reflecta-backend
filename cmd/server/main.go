@@ -2,13 +2,11 @@ package main
 
 import (
 	"log"
-	
+	"reflecta/internal/config"
+	"reflecta/internal/database"
+	"reflecta/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
-	"refecta/config"
-	"refecta/database"
-	"refecta/routes"
-	
 )
 
 func main() {
