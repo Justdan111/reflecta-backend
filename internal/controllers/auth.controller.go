@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflecta/internal/database"
 	"reflecta/internal/models"
+	"reflecta/internal/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -44,13 +45,26 @@ func Login(c *fiber.Ctx) error {
 	err := collection.FindOne(context.Background(), bson.M{"email": body.Email}).Decode(&user)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid email or password"})
 	}
 
+	// Compare passwords
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid email or password"})
 	}
 
-	return c.JSON(fiber.Map{"message": "Login successful"})
+	// Generate JWT token
+	token, _ := utils.GenerateToken(user.ID.Hex())
+
+	return c.JSON(fiber.Map{
+		"message": "Login successful",
+		"token":   token,
+		"user": fiber.Map{
+			"id":    user.ID.Hex(),
+			"name":  user.Name,
+			"email": user.Email,
+		},	
+
+	})
 }
