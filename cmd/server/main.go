@@ -21,6 +21,7 @@ func main() {
 	// setup routes
 	routes.AuthRoutes(app)
 	routes.UserRoutes(app)
+	routes.ReflectionRoutes(app)
 
 	log.Println("Server running on http://localhost:4000")
 	app.Listen(":4000")
