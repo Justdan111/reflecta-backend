@@ -11,4 +11,8 @@ func ReflectionRoutes(app *fiber.App) {
 	api := app.Group("/api/reflections", middleware.AuthMiddleware)
 
 	api.Post("/", controllers.CreateReflection)
+	api.Get("/weekly", controllers.WeeklySummary)
+	api.Get("/insights", controllers.PersonalInsights)
+
+
 }

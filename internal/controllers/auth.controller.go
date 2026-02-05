@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -64,7 +65,30 @@ func Login(c *fiber.Ctx) error {
 			"id":    user.ID.Hex(),
 			"name":  user.Name,
 			"email": user.Email,
-		},	
+		},
+	})
+}
 
+func GetProfile(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(string)
+
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
+	collection := database.DB.Collection("users")
+
+	var user models.User
+	err = collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&user)
+
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	return c.JSON(fiber.Map{
+		"id":    user.ID.Hex(),
+		"name":  user.Name,
+		"email": user.Email,
 	})
 }

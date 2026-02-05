@@ -5,8 +5,11 @@ import (
 	"reflecta/internal/config"
 	"reflecta/internal/database"
 	"reflecta/internal/routes"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
@@ -17,6 +20,15 @@ func main() {
 	database.ConnectMongo()
 
 	app := fiber.New()
+
+	// rate limiter
+	app.Use(limiter.New(limiter.Config{
+	Max:        100,
+	Expiration: time.Minute,
+}))
+
+	// logger
+app.Use(logger.New())
 
 	// setup routes
 	routes.AuthRoutes(app)

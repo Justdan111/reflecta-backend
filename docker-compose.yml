@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: refecta-api
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    restart: always
+
+  mongo:
+    image: mongo:7
+    container_name: refecta-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
