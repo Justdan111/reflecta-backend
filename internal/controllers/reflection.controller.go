@@ -243,9 +243,10 @@ func generateWeeklyInsight(reflections []models.Reflection, avgMood string) stri
 		return "Start journaling to unlock personalized insights about your emotional patterns."
 	}
 
-	if avgMood == "Positive" {
+	switch avgMood {
+case "Positive":
 		return "You had a great week! Your reflections show a positive emotional trend. Keep up the good habits that contribute to your wellbeing."
-	} else if avgMood == "Neutral" {
+	case "Neutral":
 		return "Your week was balanced. Notice what activities or thoughts bring you closer to feeling calm and content."
 	}
 	return "This week had its challenges. Remember that acknowledging difficult emotions is the first step to understanding them. Consider what small changes might support your wellbeing."
