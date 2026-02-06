@@ -5,7 +5,9 @@ WORKDIR /app
 
 # Copy go files
 COPY go.mod go.sum ./
-RUN go mod download
+
+# Download dependencies with retry and direct fallback
+RUN go mod download || GOPROXY=direct go mod download
 
 # Copy source code
 COPY . .
