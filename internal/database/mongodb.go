@@ -7,6 +7,7 @@ import (
 
 	"reflecta/internal/config"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -30,6 +31,15 @@ func ConnectMongo() {
 	}
 
 	DB = client.Database("reflecta")
+
+	// Revoked tokens are removed automatically once they would have expired anyway
+	_, err = DB.Collection("revoked_tokens").Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    bson.M{"expires_at": 1},
+		Options: options.Index().SetExpireAfterSeconds(0),
+	})
+	if err != nil {
+		log.Fatal("❌ Could not create revoked_tokens index:", err)
+	}
 
 	log.Println("✅ Successfully connected and pinged MongoDB")
 }
