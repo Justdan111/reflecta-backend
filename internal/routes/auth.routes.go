@@ -13,4 +13,5 @@ func AuthRoutes(app *fiber.App) {
 	api.Post("/register", controllers.Register)
 	api.Post("/login", controllers.Login)
 	api.Get("/profile", middleware.AuthMiddleware, controllers.GetProfile)
+	api.Post("/logout", middleware.AuthMiddleware, controllers.Logout)
 }

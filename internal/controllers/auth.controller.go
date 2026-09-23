@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -109,4 +110,28 @@ func GetProfile(c *fiber.Ctx) error {
 		"name":  user.Name,
 		"email": user.Email,
 	})
+}
+
+func Logout(c *fiber.Ctx) error {
+	tokenString := c.Locals("token").(string)
+	claims := c.Locals("claims").(jwt.MapClaims)
+
+	// Keep the revocation until the token would have expired on its own
+	expiresAt := time.Now().Add(48 * time.Hour)
+	if exp, err := claims.GetExpirationTime(); err == nil && exp != nil {
+		expiresAt = exp.Time
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := database.DB.Collection("revoked_tokens").InsertOne(ctx, bson.M{
+		"token_hash": utils.HashToken(tokenString),
+		"expires_at": expiresAt,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"message": "Logout failed"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Logged out successfully"})
 }
